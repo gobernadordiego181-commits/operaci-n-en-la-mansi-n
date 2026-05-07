@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Acción Pro - Diego Gobernador</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #000; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; touch-action: manipulation; }
+        .container { width: 100%; max-width: 450px; background: #121212; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px rgba(3, 218, 198, 0.2); }
+        .stats { color: #03DAC6; font-weight: bold; font-size: 1.2em; margin-bottom: 5px; }
+        .arma-info { color: #BB86FC; font-size: 0.9em; margin-bottom: 15px; text-transform: uppercase; }
+        .estado { font-size: 1.1em; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; color: #aaa; }
+        .alerta { color: #ff1111; font-weight: bold; min-height: 24px; margin-bottom: 15px; visibility: hidden; }
+        button { width: 100%; padding: 14px; margin: 6px 0; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.1s; text-transform: uppercase; -webkit-tap-highlight-color: transparent; }
+        button:active { transform: scale(0.95); background-color: #555; }
+        .btn-lugar { background-color: #333; color: white; }
+        .btn-tienda { background-color: #CF6679; color: white; }
+        .btn-disparar { background-color: #B00020; color: white; height: 100px; font-size: 22px; }
+        .btn-ventana { background-color: #1976D2; color: white; height: 60px; }
+        .btn-volver { background-color: #444; color: white; margin-top: 15px; }
+        .btn-cerrar { background-color: #b71c1c; color: white; margin-top: 25px; border: 2px solid #ff5252; }
+        .hidden { display: none !important; }
+        #pantallaInicio { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 100; }
+    </style>
+</head>
+<body>
+
+<div id="pantallaInicio" onclick="iniciarJuego()">
+    <div class="container">
+        <h2 style="color:#03DAC6">PROYECTO: DIEGO GOBERNADOR</h2>
+        <p>Toca cualquier lugar para iniciar la unidad</p>
+        <button class="btn-lugar">ENTRAR AL SISTEMA</button>
+    </div>
+</div>
+
+<div id="gameContainer" class="container hidden">
+    <div id="txtStats" class="stats">BAJAS: 0 | MONEDAS: $0</div>
+    <div id="txtArmaActual" class="arma-info">EQUIPADA: PISTOLA</div>
+    <div id="txtEstado" class="estado">CENTRO DE MANDO</div>
+    <div id="txtAlertaEnemigo" class="alerta"></div>
+
+    <div id="layoutMenu">
+        <button class="btn-lugar" onclick="viajarA('SÓTANO', sonidos.sotano)">🧱 SÓTANO</button>
+        <button class="btn-lugar" onclick="viajarA('GARAJE', sonidos.garaje)">🚗 GARAJE</button>
+        <button class="btn-lugar" onclick="viajarA('PATIO', sonidos.patio)">🌳 PATIO</button>
+        <button class="btn-lugar" onclick="viajarA('DORMITORIO', sonidos.dormitorio)">🛌 DORMITORIO</button>
+        <button class="btn-lugar" onclick="viajarA('GIMNASIO', sonidos.gimnasio)">🏋️ GIMNASIO</button>
+        <button class="btn-tienda" onclick="abrirTienda()">🛒 TIENDA</button>
+        <button class="btn-cerrar" onclick="cerrarJuego()">🚪 CERRAR JUEGO</button>
+    </div>
+
+    <div id="layoutTienda" class="hidden">
+        <div id="listaTienda"></div>
+    </div>
+
+    <div id="layoutDisparos" class="hidden">
+        <button class="btn-disparar" onclick="disparar('NORMAL')">💥 DISPARAR AL CUERPO</button>
+        <button class="btn-ventana" onclick="disparar('VENTANA')">🪟 DISPARAR A VENTANA</button>
+    </div>
+
+    <button id="btnVolver" class="btn-volver hidden" onclick="volver()">⬅️ REGRESAR</button>
+</div>
+
+<div id="pantallaSalida" class="hidden">
+    <div class="container">
+        <h2 style="color:#ff5252">OPERACIÓN TERMINADA</h2>
+        <button class="btn-lugar" onclick="location.reload()">REINICIAR JUEGO</button>
+    </div>
+</div>
+
+<script>
+    const sonidos = {
+        inicio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview123/v4/a2/1b/28/a21b28f0-fad0-4a41-7e50-91a2189babae/mzaf_4293814841609392196.plus.aac.p.m4a",
+        puerta: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/9a/bd/86/mzm.xthhuevq.aac.p.m4a",
+        ventana: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/13/29/37/mzi.figfpbys.aac.p.m4a",
+        muerte_enemigo: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/88/e1/0c/88e10c9e-d61b-c70b-bb37-76d01a5bc1b8/mzaf_4514180236780566538.plus.aac.p.m4a",
+        aparicion_enemigo: "https://audio-ssl.itunes.apple.com/itunes-assets/Music49/v4/46/7a/d2/467ad2e8-b935-698d-3fac-fe52db582e9f/mzaf_4231950099606023021.plus.aac.p.m4a",
+        caja_registradora: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/10/57/d3/mzi.aqzkfccl.aac.p.m4a",
+        ganar_monedas: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview128/v4/ae/c6/fb/aec6fb4a-b611-3f37-2d63-7d08ed0c6a2c/mzaf_432145209495902696.plus.aac.p.m4a",
+        sotano: "https://audio-ssl.itunes.apple.com/itunes-assets/Music2/v4/bc/07/32/bc0732ea-10ad-5155-954a-f2e8792cc64e/mzaf_263254705366250781.plus.aac.p.m4a",
+        garaje: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview30/v4/de/04/83/de048374-d685-e8ba-b78c-1edcbf2c30aa/mzaf_1739495646603168620.plus.aac.p.m4a",
+        patio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/56/fe/d1/56fed19d-c176-335a-45eb-3838b2cfbcbc/mzaf_6679725853651299047.plus.aac.p.m4a",
+        dormitorio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/4d/92/ec4d9293-512a-2279-a740-95b1c930eb67/mzaf_15926217069365452322.plus.aac.p.m4a",
+        gimnasio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview18/v4/a1/fc/44/a1fc4457-9ebd-07ef-c709-77eec046c0ab/mzaf_7879227667139224588.plus.aac.p.m4a"
+    };
+
+    const inventario = [
+        {nombre: "PISTOLA", sonido: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/bf/22/7b/bf227b10-691d-bc90-433c-d252eda15921/mzaf_7872033406982408122.plus.aac.p.m4a", precio: 0, comprada: true},
+        {nombre: "ESCOPETA", sonido: "https://audio-ssl.itunes.apple.com/itunes-assets/Music7/v4/df/2d/d6/df2dd6fc-6a74-b8e1-00c9-7d7d97f79f0b/mzaf_2373349655772360792.plus.aac.p.m4a", precio: 150, comprada: false},
+        {nombre: "FUSIL", sonido: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview118/v4/56/08/11/56081197-30f7-a068-bdb4-24f1abaa5e62/mzaf_8416388803162474287.plus.aac.p.m4a", precio: 350, comprada: false},
+        {nombre: "METRALLETA", sonido: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/a9/3c/8a/a93c8a73-bd26-6a72-c6cc-1bdbe06373ea/mzaf_1466118082777342552.plus.aac.p.m4a", precio: 500, comprada: false}
+    ];
+
+    const puntos = {
+        "SÓTANO": ["tras las cajas", "bajo la escalera", "en el tragaluz", "en la caldera", "tras el pilar", "en el conducto", "en el baúl", "en los estantes"],
+        "GARAJE": ["en la ventanilla del coche", "tras los neumáticos", "en la ventana lateral", "bajo el capó", "en el banco", "tras la moto", "en las repisas"],
+        "PATIO": ["tras los arbustos", "sobre la barda", "en el ventanal", "bajo el árbol", "tras la fuente", "en la caseta", "en la alberca", "tras la barbacoa"],
+        "DORMITORIO": ["en la cama", "tras el ropero", "en la ventana del balcón", "bajo la mesa", "tras las cortinas", "en el vestidor", "tras el espejo"],
+        "GIMNASIO": ["tras las pesas", "en las bancas", "tras los vidrios", "en la caminadora", "detrás del saco", "tras el dispensador"]
+    };
+
+    let monedas = 0, monedasPendientes = 0, bajas = 0, armaEquipadaIdx = 0, lugarActual = "", enemigoActual = "";
+    let mpAmbiente = new Audio(); mpAmbiente.loop = true;
+
+    // Función para sonidos con desbloqueo de audio
+    function sonarEfecto(url) {
+        const s = new Audio(url);
+        s.play().catch(() => console.log("Error de audio"));
+    }
+
+    function iniciarJuego() {
+        document.getElementById('pantallaInicio').classList.add('hidden');
+        document.getElementById('gameContainer').classList.remove('hidden');
+        mpAmbiente.src = sonidos.inicio;
+        mpAmbiente.play().catch(() => {});
+    }
+
+    function viajarA(lugar, urlAmbiente) {
+        lugarActual = lugar;
+        document.getElementById('layoutMenu').classList.add('hidden');
+        document.getElementById('txtEstado').innerText = "VIAJANDO...";
+        sonarEfecto(sonidos.puerta);
+        
+        setTimeout(() => {
+            mpAmbiente.src = urlAmbiente; mpAmbiente.play();
+            document.getElementById('txtEstado').innerText = "📍 " + lugar;
+            document.getElementById('layoutDisparos').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            nuevoEnemigo();
+        }, 400); 
+    }
+
+    function nuevoEnemigo() {
+        const lista = puntos[lugarActual];
+        enemigoActual = lista[Math.floor(Math.random() * lista.length)];
+        sonarEfecto(sonidos.aparicion_enemigo);
+        const alerta = document.getElementById('txtAlertaEnemigo');
+        alerta.innerText = "⚠️ ENEMIGO: " + enemigoActual.toUpperCase();
+        alerta.style.visibility = "visible";
+    }
+
+    function disparar(tipo) {
+        sonarEfecto(inventario[armaEquipadaIdx].sonido);
+        const esVentana = enemigoActual.match(/ventana|ventanal|tragaluz|vidrio|cristal|ventanilla/i);
+        
+        setTimeout(() => {
+            if (tipo === 'VENTANA' && esVentana) {
+                sonarEfecto(sonidos.ventana); exito(35);
+            } else if (tipo === 'NORMAL' && !esVentana) {
+                exito(20);
+            } else {
+                alert(esVentana ? "¡Está tras un vidrio! Usa VENTANA." : "¡No hay cristales ahí!");
+            }
+        }, 200);
+    }
+
+    function exito(premio) {
+        sonarEfecto(sonidos.muerte_enemigo);
+        bajas++; monedasPendientes += premio;
+        actualizarInterfaz();
+        document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
+        setTimeout(nuevoEnemigo, 1000);
+    }
+
+    function abrirTienda() {
+        document.getElementById('layoutMenu').classList.add('hidden');
+        document.getElementById('layoutTienda').classList.remove('hidden');
+        document.getElementById('btnVolver').classList.remove('hidden');
+        renderizarTienda();
+    }
+
+    function renderizarTienda() {
+        const contenedor = document.getElementById('listaTienda');
+        contenedor.innerHTML = "";
+        inventario.forEach((item, index) => {
+            const btn = document.createElement('button');
+            btn.className = "btn-lugar";
+            btn.innerText = item.comprada ? (armaEquipadaIdx === index ? "EQUIPADA" : item.nombre) : `${item.nombre} ($${item.precio})`;
+            if(item.comprada && armaEquipadaIdx === index) btn.style.color = "#03DAC6";
+            btn.onclick = () => {
+                if (item.comprada) { armaEquipadaIdx = index; }
+                else if (monedas >= item.precio) {
+                    monedas -= item.precio; item.comprada = true; armaEquipadaIdx = index;
+                    sonarEfecto(sonidos.caja_registradora);
+                }
+                renderizarTienda(); actualizarInterfaz();
+            };
+            contenedor.appendChild(btn);
+        });
+    }
+
+    function volver() {
+        if (monedasPendientes > 0) { monedas += monedasPendientes; sonarEfecto(sonidos.ganar_monedas); }
+        monedasPendientes = 0; mpAmbiente.pause();
+        document.getElementById('layoutDisparos').classList.add('hidden');
+        document.getElementById('layoutTienda').classList.add('hidden');
+        document.getElementById('layoutMenu').classList.remove('hidden');
+        document.getElementById('btnVolver').classList.add('hidden');
+        document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
+        document.getElementById('txtEstado').innerText = "CENTRO DE MANDO";
+        actualizarInterfaz();
+        mpAmbiente.src = sonidos.inicio; mpAmbiente.play();
+    }
+
+    function cerrarJuego() {
+        mpAmbiente.pause();
+        mpAmbiente.src = "";
+        document.getElementById('gameContainer').classList.add('hidden');
+        document.getElementById('pantallaSalida').classList.remove('hidden');
+    }
+
+    function actualizarInterfaz() {
+        document.getElementById('txtStats').innerText = `BAJAS: ${bajas} | MONEDAS: $${monedas} ${monedasPendientes > 0 ? '(+'+monedasPendientes+')' : ''}`;
+        document.getElementById('txtArmaActual').innerText = "EQUIPADA: " + inventario[armaEquipadaIdx].nombre;
+    }
+</script>
+</body>
+</html>
