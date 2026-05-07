@@ -45,7 +45,7 @@
         <button class="btn-lugar" onclick="viajarA('PATIO', sonidos.patio)">🌳 PATIO</button>
         <button class="btn-lugar" onclick="viajarA('DORMITORIO', sonidos.dormitorio)">🛌 DORMITORIO</button>
         <button class="btn-lugar" onclick="viajarA('GIMNASIO', sonidos.gimnasio)">🏋️ GIMNASIO</button>
-        <button class="btn-lugar" onclick="viajarA('BAÑO', sonidos.baño)">🚽 BAÑO</button>
+        <button class="btn-lugar" onclick="viajarA('AGENCIA', sonidos.agencia)">🏢 AGENCIA AUTOMOTRIZ</button>
         
         <button class="btn-tienda" onclick="abrirTienda()">🛒 TIENDA</button>
         <button class="btn-cerrar" onclick="cerrarJuego()">🚪 CERRAR JUEGO</button>
@@ -84,7 +84,7 @@
         patio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/56/fe/d1/56fed19d-c176-335a-45eb-3838b2cfbcbc/mzaf_6679725853651299047.plus.aac.p.m4a",
         dormitorio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/4d/92/ec4d9293-512a-2279-a740-95b1c930eb67/mzaf_15926217069365452322.plus.aac.p.m4a",
         gimnasio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview18/v4/a1/fc/44/a1fc4457-9ebd-07ef-c709-77eec046c0ab/mzaf_7879227667139224588.plus.aac.p.m4a",
-        baño: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/9a/bd/86/mzm.xthhuevq.aac.p.m4a" // Sonido para el baño
+        agencia: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/3d/8d/6d/3d8d6d62-63b7-789a-051f-50b3f545f448/mzaf_15967597148972173195.plus.aac.p.m4a"
     };
 
     const inventario = [
@@ -100,7 +100,7 @@
         "PATIO": ["tras los arbustos", "sobre la barda", "en el ventanal", "bajo el árbol", "tras la fuente", "en la caseta", "en la alberca", "tras la barbacoa"],
         "DORMITORIO": ["en la cama", "tras el ropero", "en la ventana del balcón", "bajo la mesa", "tras las cortinas", "en el vestidor", "tras el espejo"],
         "GIMNASIO": ["tras las pesas", "en las bancas", "tras los vidrios", "en la caminadora", "detrás del saco", "tras el dispensador"],
-        "BAÑO": ["tras la cortina", "en la tina", "bajo el lavabo", "en el espejo", "tras el inodoro", "en el gabinete"] // Puntos del baño
+        "AGENCIA": ["tras el auto de exhibición", "en el escritorio de ventas", "tras el cristal principal", "en la zona de entrega", "detrás de la columna", "en el mostrador"] 
     };
 
     let monedas = 0, monedasPendientes = 0, bajas = 0, armaEquipadaIdx = 0, lugarActual = "", enemigoActual = "";
@@ -114,6 +114,7 @@
     function iniciarJuego() {
         document.getElementById('pantallaInicio').classList.add('hidden');
         document.getElementById('gameContainer').classList.remove('hidden');
+        mpAmbiente.pause();
         mpAmbiente.src = sonidos.inicio;
         mpAmbiente.play().catch(() => {});
     }
@@ -124,8 +125,12 @@
         document.getElementById('txtEstado').innerText = "VIAJANDO...";
         sonarEfecto(sonidos.puerta);
         
+        // Detener audio anterior antes de cambiar
+        mpAmbiente.pause();
+        
         setTimeout(() => {
-            mpAmbiente.src = urlAmbiente; mpAmbiente.play();
+            mpAmbiente.src = urlAmbiente; 
+            mpAmbiente.play().catch(() => {});
             document.getElementById('txtEstado').innerText = "📍 " + lugar;
             document.getElementById('layoutDisparos').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
@@ -194,7 +199,11 @@
 
     function volver() {
         if (monedasPendientes > 0) { monedas += monedasPendientes; sonarEfecto(sonidos.ganar_monedas); }
-        monedasPendientes = 0; mpAmbiente.pause();
+        monedasPendientes = 0; 
+        
+        // Limpiar audio de nivel y volver al de inicio
+        mpAmbiente.pause();
+        
         document.getElementById('layoutDisparos').classList.add('hidden');
         document.getElementById('layoutTienda').classList.add('hidden');
         document.getElementById('layoutMenu').classList.remove('hidden');
@@ -202,7 +211,9 @@
         document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
         document.getElementById('txtEstado').innerText = "CENTRO DE MANDO";
         actualizarInterfaz();
-        mpAmbiente.src = sonidos.inicio; mpAmbiente.play();
+        
+        mpAmbiente.src = sonidos.inicio; 
+        mpAmbiente.play().catch(() => {});
     }
 
     function cerrarJuego() {
