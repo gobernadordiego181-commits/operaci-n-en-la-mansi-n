@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de AcciÃ³n Pro - Diego Gobernador</title>
+    <title>Juego de Acción Pro - Diego Gobernador</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #000; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; touch-action: manipulation; }
         .container { width: 100%; max-width: 450px; background: #121212; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px rgba(3, 218, 198, 0.2); }
@@ -19,8 +19,16 @@
         .btn-ventana { background-color: #1976D2; color: white; height: 60px; }
         .btn-volver { background-color: #444; color: white; margin-top: 15px; }
         .btn-cerrar { background-color: #b71c1c; color: white; margin-top: 25px; border: 2px solid #ff5252; }
+        
+        .atm-screen { background: #002b36; border: 4px solid #555; border-radius: 10px; padding: 15px; margin-bottom: 15px; min-height: 60px; color: #00ff00; font-family: 'Courier New', monospace; }
+        .atm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
+        .btn-num { background: #333; color: white; padding: 15px; font-size: 18px; }
+
         .hidden { display: none !important; }
         #pantallaInicio { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 100; }
+        
+        .item-tienda { background: #222; padding: 10px; margin: 5px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #CF6679; text-align: left; }
+        .item-nombre { font-size: 0.85em; flex-grow: 1; margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -34,32 +42,57 @@
 </div>
 
 <div id="gameContainer" class="container hidden">
-    <div id="txtStats" class="stats">ACCIONES: 0 | MONEDAS: $0</div>
+    <div id="txtStats" class="stats">ACCIONES: 0 | BOLSILLO: $0</div>
     <div id="txtArmaActual" class="arma-info">EQUIPADA: PISTOLA</div>
     <div id="txtEstado" class="estado">CENTRO DE MANDO</div>
     <div id="txtAlertaEnemigo" class="alerta"></div>
 
     <div id="layoutMenu">
-        <button class="btn-lugar" onclick="viajarA('SÃTANO', sonidos.sotano)">ð§± SÃTANO</button>
-        <button class="btn-lugar" onclick="viajarA('GARAJE', sonidos.garaje)">ð GARAJE</button>
-        <button class="btn-lugar" onclick="viajarA('PATIO', sonidos.patio)">ð³ PATIO</button>
-        <button class="btn-lugar" onclick="viajarA('DORMITORIO', sonidos.dormitorio)">ð DORMITORIO</button>
-        <button class="btn-lugar" onclick="viajarA('GIMNASIO', sonidos.gimnasio)">ðï¸ GIMNASIO</button>
-        <button class="btn-lugar" style="background-color: #4CAF50;" onclick="viajarA('GRANJITA', sonidos.granjita)">ð¥ GRANJITA</button>
-        <button class="btn-tienda" onclick="abrirTienda()">ð TIENDA</button>
-        <button class="btn-cerrar" onclick="cerrarJuego()">ðª CERRAR JUEGO</button>
+        <button class="btn-lugar" onclick="viajarA('SÓTANO', sonidos.sotano)">🧱 SÓTANO</button>
+        <button class="btn-lugar" onclick="viajarA('GARAJE', sonidos.garaje)">🚗 GARAJE</button>
+        <button class="btn-lugar" style="background-color: #FFD600; color: #000;" onclick="abrirCajero()">🏧 CAJERO AUTOMÁTICO</button>
+        <button class="btn-lugar" onclick="viajarA('DORMITORIO', sonidos.dormitorio)">🛌 DORMITORIO</button>
+        <button class="btn-lugar" onclick="viajarA('GIMNASIO', sonidos.gimnasio)">🏋️‍♂️ GIMNASIO</button>
+        <button class="btn-lugar" style="background-color: #4CAF50;" onclick="viajarA('GRANJITA', sonidos.granjita)">🐥 GRANJITA</button>
+        <button class="btn-tienda" onclick="abrirTienda()">🛒 TIENDA</button>
+        <button class="btn-cerrar" onclick="cerrarJuego()">🚪 CERRAR JUEGO</button>
+    </div>
+
+    <div id="layoutCajero" class="hidden">
+        <div class="atm-screen">
+            <div id="mensajeATM">INSERTE TARJETA</div>
+            <div id="montoATM" style="font-size: 24px; font-weight: bold; margin-top: 5px;"></div>
+        </div>
+        <button id="btnTarjeta" class="btn-lugar" style="background:#1976D2;" onclick="insertarTarjeta()">💳 INSERTAR TARJETA</button>
+        <div id="controlesATM" class="hidden">
+            <div class="atm-grid">
+                <button class="btn-num" onclick="tecla('1')">1</button>
+                <button class="btn-num" onclick="tecla('2')">2</button>
+                <button class="btn-num" onclick="tecla('3')">3</button>
+                <button class="btn-num" onclick="tecla('4')">4</button>
+                <button class="btn-num" onclick="tecla('5')">5</button>
+                <button class="btn-num" onclick="tecla('6')">6</button>
+                <button class="btn-num" onclick="tecla('7')">7</button>
+                <button class="btn-num" onclick="tecla('8')">8</button>
+                <button class="btn-num" onclick="tecla('9')">9</button>
+                <button class="btn-lugar" style="background:#c62828" onclick="borrar()">C</button>
+                <button class="btn-num" onclick="tecla('0')">0</button>
+                <button class="btn-lugar" style="background:#2e7d32; font-size:10px" onclick="verSaldo()">SALDO</button>
+            </div>
+            <button class="btn-lugar" style="background:#FFD600; color:black" onclick="retirar()">RETIRAR EFECTIVO</button>
+        </div>
     </div>
 
     <div id="layoutTienda" class="hidden">
-        <div id="listaTienda"></div>
+        <div id="listaTienda" style="max-height: 400px; overflow-y: auto;"></div>
     </div>
 
     <div id="layoutDisparos" class="hidden">
-        <button id="btnAccionPrincipal" class="btn-disparar" onclick="disparar()">ð¥ ACCIÃN</button>
-        <button id="btnAccionSecundaria" class="btn-ventana" onclick="disparar('VENTANA')">ðª VENTANA</button>
+        <button id="btnAccionPrincipal" class="btn-disparar" onclick="disparar()">💥 ACCIÓN</button>
+        <button id="btnAccionSecundaria" class="btn-ventana" onclick="disparar('VENTANA')">🪟 VENTANA</button>
     </div>
 
-    <button id="btnVolver" class="btn-volver hidden" onclick="volver()">â¬ï¸ REGRESAR</button>
+    <button id="btnVolver" class="btn-volver hidden" onclick="volver()">⬅️ REGRESAR</button>
 </div>
 
 <script>
@@ -69,52 +102,44 @@
         error_dinero: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/e3/91/55/e3915559-ce44-59ee-e4b5-a9975d7be6b7/mzaf_5738924103697557085.plus.aac.p.m4a",
         puerta: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/9a/bd/86/mzm.xthhuevq.aac.p.m4a",
         ventana: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/13/29/37/mzi.figfpbys.aac.p.m4a",
+        pistola: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/bf/22/7b/bf227b10-691d-bc90-433c-d252eda15921/mzaf_7872033406982408122.plus.aac.p.m4a",
         muerte_enemigo: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/88/e1/0c/88e10c9e-d61b-c70b-bb37-76d01a5bc1b8/mzaf_4514180236780566538.plus.aac.p.m4a",
         aparicion_enemigo: "https://audio-ssl.itunes.apple.com/itunes-assets/Music49/v4/46/7a/d2/467ad2e8-b935-698d-3fac-fe52db582e9f/mzaf_4231950099606023021.plus.aac.p.m4a",
         caja_registradora: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/10/57/d3/mzi.aqzkfccl.aac.p.m4a",
-        
         sotano: "https://audio-ssl.itunes.apple.com/itunes-assets/Music2/v4/bc/07/32/bc0732ea-10ad-5155-954a-f2e8792cc64e/mzaf_263254705366250781.plus.aac.p.m4a",
         garaje: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview30/v4/de/04/83/de048374-d685-e8ba-b78c-1edcbf2c30aa/mzaf_1739495646603168620.plus.aac.p.m4a",
-        patio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/56/fe/d1/56fed19d-c176-335a-45eb-3838b2cfbcbc/mzaf_6679725853651299047.plus.aac.p.m4a",
         dormitorio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/4d/92/ec4d9293-512a-2279-a740-95b1c930eb67/mzaf_15926217069365452322.plus.aac.p.m4a",
         gimnasio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview18/v4/a1/fc/44/a1fc4457-9ebd-07ef-c709-77eec046c0ab/mzaf_7879227667139224588.plus.aac.p.m4a",
         granjita: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview60/v4/74/12/d7/7412d72d-4473-bd10-69e2-e238da355a73/mzaf_4490121898677393044.plus.aac.p.m4a",
-        
-        comer_animal: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview128/v4/e7/e0/81/e7e08192-a089-c75b-2095-9f421250f810/mzaf_8409104725167469398.plus.aac.p.m4a",
-        agua_animal: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/f6/4e/c5/f64ec556-b7bf-2caf-79fa-76b4ee3e7c86/mzaf_5942655225916879068.plus.aac.p.m4a",
-        sonido_gatito: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/40/35/1d/mzm.tjesbjop.aac.p.m4a",
-        sonido_perrito: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/d6/c9/ee/d6c9eed8-3396-f894-91d6-653cb7a2cfb2/mzaf_5754169641166804433.plus.aac.p.m4a"
+        tecla_atm: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/c4/71/63/mzm.adfzpixy.aac.p.m4a",
+        retiro_exito: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/36/db/b9/36dbb957-0731-8ba3-dfee-0d40eb0f61be/mzaf_2892340779846391516.plus.aac.p.m4a",
+        consulta_saldo: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/ea/8f/a1/ea8fa152-35c1-b5f6-489e-e6a1d60f0255/mzaf_5337907866947136257.plus.aac.p.m4a",
+        insertar_tarjeta: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/b3/87/89/mzm.aetuycmn.aac.p.m4a"
     };
 
-    const inventario = [
-        {nombre: "PISTOLA", precio: 0},
-        {nombre: "ESCOPETA", precio: 150},
-        {nombre: "FUSIL", precio: 350},
-        {nombre: "METRALLETA", precio: 500},
-        {nombre: "SACO SEMILLAS", precio: 50},
-        {nombre: "BOTE DE AGUA", precio: 30},
-        {nombre: "COSTAL WHISKAS", precio: 120},
-        {nombre: "COSTAL CROQUETAS", precio: 150},
-        {nombre: "VITAMINAS", precio: 100}
+    const inventarioTienda = [
+        { nombre: "🛡️ CHALECO ANTIBALAS", precio: 1500 },
+        { nombre: "🚜 TRACTOR PEQUEÑO (GRANJA)", precio: 3000 },
+        { nombre: "🛌 CAMA KING SIZE (CUARTO)", precio: 1200 },
+        { nombre: "🏋️ BANCO DE PESAS PRO (GYM)", precio: 800 },
+        { nombre: "📦 ESTANTERÍA METAL (SÓTANO)", precio: 500 },
+        { nombre: "💡 LUCES LED (GARAJE)", precio: 300 },
+        { nombre: "🥩 COMIDA PREMIUM (ANIMALES)", precio: 100 }
     ];
 
     const puntos = {
-        "SÃTANO": ["tras las cajas", "bajo la escalera", "en el tragaluz"],
-        "GARAJE": ["en la ventanilla", "tras los neumÃ¡ticos"],
-        "PATIO": ["tras los arbustos", "sobre la barda"],
+        "SÓTANO": ["tras las cajas", "bajo la escalera", "en el tragaluz"],
+        "GARAJE": ["en la ventanilla", "tras los neumáticos"],
         "DORMITORIO": ["en la cama", "tras el ropero"],
         "GIMNASIO": ["tras las pesas", "en las bancas"],
         "GRANJITA": ["al gallo", "a la gallina", "a la vaca", "al pollito", "al pato", "al gatito", "al perrito"]
     };
 
-    let monedas = 0, monedasPendientes = 0, bajas = 0, lugarActual = "", enemigoActual = "";
+    let bolsillo = 0, monedasGanadas = 0, bajas = 0, lugarActual = "", enemigoActual = "";
+    let saldoTarjeta = 5000, entradaATM = "";
     let mpAmbiente = new Audio(); mpAmbiente.loop = true;
 
-    function sonarEfecto(url) {
-        if(!url) return;
-        const s = new Audio(url);
-        s.play().catch(() => {});
-    }
+    function sonarEfecto(url) { if(!url) return; const s = new Audio(url); s.play().catch(() => {}); }
 
     function iniciarJuego() {
         document.getElementById('pantallaInicio').classList.add('hidden');
@@ -130,9 +155,8 @@
         sonarEfecto(sonidos.puerta);
         mpAmbiente.pause();
         setTimeout(() => {
-            mpAmbiente.src = urlAmbiente; 
-            mpAmbiente.play();
-            document.getElementById('txtEstado').innerText = "ð " + lugar;
+            mpAmbiente.src = urlAmbiente; mpAmbiente.play().catch(() => {});
+            document.getElementById('txtEstado').innerText = "📍 " + lugar;
             document.getElementById('layoutDisparos').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
             nuevoEnemigo();
@@ -146,121 +170,127 @@
         const alerta = document.getElementById('txtAlertaEnemigo');
         const btnPrincipal = document.getElementById('btnAccionPrincipal');
         const btnSecundario = document.getElementById('btnAccionSecundaria');
-        
+        alerta.style.visibility = "visible";
         if(lugarActual === 'GRANJITA') {
             btnSecundario.classList.add('hidden');
             btnPrincipal.style.backgroundColor = "#2E7D32";
-            if (enemigoActual === 'a la gallina') {
-                alerta.innerText = "ð§ DALE AGUA: " + enemigoActual.toUpperCase();
-                btnPrincipal.innerText = "ð§ DAR AGUA";
-            } else {
-                alerta.innerText = "ð¾ DALE COMIDA: " + enemigoActual.toUpperCase();
-                btnPrincipal.innerText = "ð¾ DAR COMIDA";
-            }
+            alerta.innerText = "❤️ TRABAJO: " + enemigoActual.toUpperCase();
+            btnPrincipal.innerText = "DAR COMIDA";
         } else {
             btnSecundario.classList.remove('hidden');
-            btnPrincipal.innerText = "ð¥ DISPARAR CUERPO";
             btnPrincipal.style.backgroundColor = "#B00020";
-            alerta.innerText = "â ï¸ ENEMIGO: " + enemigoActual.toUpperCase();
+            alerta.innerText = "⚠️ ENEMIGO: " + enemigoActual.toUpperCase();
+            btnPrincipal.innerText = "DISPARAR";
         }
-        alerta.style.visibility = "visible";
     }
 
     function disparar(tipo) {
         if(lugarActual === 'GRANJITA') {
-            if((monedas + monedasPendientes) < 25) { 
-                sonarEfecto(sonidos.error_dinero);
-                alert("Â¡Necesitas dinero para suministros!");
-                return;
-            }
-            monedasPendientes -= 10; 
+            sonarEfecto(sonidos.muerte_enemigo); 
+            exito(25);
         } else {
-            // Sonido de disparo normal o ventana segÃºn el botÃ³n
-            if(tipo === 'VENTANA') sonarEfecto(sonidos.ventana);
-            else sonarEfecto("https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/bf/22/7b/bf227b10-691d-bc90-433c-d252eda15921/mzaf_7872033406982408122.plus.aac.p.m4a");
+            sonarEfecto(tipo === 'VENTANA' ? sonidos.ventana : sonidos.pistola);
+            setTimeout(() => { sonarEfecto(sonidos.muerte_enemigo); exito(20); }, 200);
         }
-        
-        setTimeout(() => {
-            if (lugarActual === 'GRANJITA') {
-                if (enemigoActual === 'a la gallina') sonarEfecto(sonidos.agua_animal);
-                else if (enemigoActual === 'al gatito') sonarEfecto(sonidos.sonido_gatito);
-                else if (enemigoActual === 'al perrito') sonarEfecto(sonidos.sonido_perrito);
-                else sonarEfecto(sonidos.comer_animal);
-                exito(25);
-            } else {
-                exito(20);
-            }
-        }, 200);
     }
 
     function exito(premio) {
-        if(lugarActual !== 'GRANJITA') sonarEfecto(sonidos.muerte_enemigo);
-        bajas++; 
-        monedasPendientes += premio;
-        actualizarInterfaz();
+        bajas++; monedasGanadas += premio; actualizarInterfaz();
         document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
-        setTimeout(() => {
-            if(lugarActual !== "") nuevoEnemigo();
-        }, 1000);
+        setTimeout(() => { if(lugarActual !== "") nuevoEnemigo(); }, 1000);
+    }
+
+    function abrirCajero() {
+        depositarATarjeta();
+        sonarEfecto(sonidos.puerta); mpAmbiente.pause();
+        document.getElementById('layoutMenu').classList.add('hidden');
+        document.getElementById('layoutCajero').classList.remove('hidden');
+        document.getElementById('btnVolver').classList.remove('hidden');
+        document.getElementById('txtEstado').innerText = "🏧 CAJERO";
+        entradaATM = ""; document.getElementById('btnTarjeta').classList.remove('hidden');
+        document.getElementById('controlesATM').classList.add('hidden');
+        document.getElementById('mensajeATM').innerText = "INSERTE TARJETA";
+        document.getElementById('montoATM').innerText = "";
+    }
+
+    function insertarTarjeta() {
+        sonarEfecto(sonidos.insertar_tarjeta);
+        document.getElementById('btnTarjeta').classList.add('hidden');
+        document.getElementById('controlesATM').classList.remove('hidden');
+        document.getElementById('mensajeATM').innerText = "HOLA";
+    }
+
+    function tecla(n) { sonarEfecto(sonidos.tecla_atm); if(entradaATM.length < 6) { entradaATM += n; document.getElementById('montoATM').innerText = "$" + entradaATM; } }
+    function borrar() { sonarEfecto(sonidos.tecla_atm); entradaATM = ""; document.getElementById('montoATM').innerText = ""; }
+    function verSaldo() { sonarEfecto(sonidos.consulta_saldo); document.getElementById('mensajeATM').innerText = "SALDO:"; document.getElementById('montoATM').innerText = "$" + saldoTarjeta; }
+    
+    function retirar() {
+        let cant = parseInt(entradaATM);
+        if(cant > 0 && cant <= saldoTarjeta) {
+            saldoTarjeta -= cant; 
+            bolsillo += cant;
+            sonarEfecto(sonidos.retiro_exito);
+            document.getElementById('mensajeATM').innerText = "¡EXITO!";
+            actualizarInterfaz();
+        } else { document.getElementById('mensajeATM').innerText = "ERROR"; }
+        entradaATM = ""; document.getElementById('montoATM').innerText = "";
     }
 
     function abrirTienda() {
-        monedas += monedasPendientes;
-        monedasPendientes = 0;
-        mpAmbiente.pause();
+        depositarATarjeta();
         document.getElementById('layoutMenu').classList.add('hidden');
         document.getElementById('layoutTienda').classList.remove('hidden');
         document.getElementById('btnVolver').classList.remove('hidden');
-        mpAmbiente.src = sonidos.tienda_fondo; 
-        mpAmbiente.play();
-        renderizarTienda();
+        mpAmbiente.pause(); mpAmbiente.src = sonidos.tienda_fondo; mpAmbiente.play().catch(() => {});
+        
+        const lista = document.getElementById('listaTienda');
+        lista.innerHTML = "";
+        inventarioTienda.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'item-tienda';
+            div.innerHTML = `<span class="item-nombre">${item.nombre}</span> <button style="width:100px; padding:8px; margin:0; background:#CF6679" onclick="comprarItem(${item.precio})">$${item.precio}</button>`;
+            lista.appendChild(div);
+        });
+        actualizarInterfaz();
     }
 
-    function renderizarTienda() {
-        const contenedor = document.getElementById('listaTienda');
-        contenedor.innerHTML = "";
-        inventario.forEach((item) => {
-            const btn = document.createElement('button');
-            btn.className = "btn-lugar";
-            btn.innerText = `${item.nombre} ($${item.precio})`;
-            btn.onclick = () => {
-                if (monedas >= item.precio) {
-                    monedas -= item.precio; 
-                    sonarEfecto(sonidos.caja_registradora);
-                    actualizarInterfaz();
-                } else {
-                    sonarEfecto(sonidos.error_dinero);
-                }
-            };
-            contenedor.appendChild(btn);
-        });
+    function comprarItem(precio) {
+        if(bolsillo >= precio) {
+            bolsillo -= precio;
+            sonarEfecto(sonidos.caja_registradora);
+            actualizarInterfaz();
+        } else {
+            sonarEfecto(sonidos.error_dinero);
+            alert("No tienes suficiente dinero en el BOLSILLO. Retira del cajero.");
+        }
+    }
+
+    function depositarATarjeta() {
+        saldoTarjeta += monedasGanadas;
+        monedasGanadas = 0;
+        actualizarInterfaz();
     }
 
     function volver() {
         mpAmbiente.pause();
-        monedas += monedasPendientes;
-        monedasPendientes = 0; 
-        lugarActual = ""; 
-        const alerta = document.getElementById('txtAlertaEnemigo');
-        alerta.innerText = "";
-        alerta.style.visibility = "hidden";
+        depositarATarjeta();
+        lugarActual = "";
+        document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
         document.getElementById('layoutDisparos').classList.add('hidden');
         document.getElementById('layoutTienda').classList.add('hidden');
+        document.getElementById('layoutCajero').classList.add('hidden');
         document.getElementById('layoutMenu').classList.remove('hidden');
         document.getElementById('btnVolver').classList.add('hidden');
         document.getElementById('txtEstado').innerText = "CENTRO DE MANDO";
         actualizarInterfaz();
-        mpAmbiente.src = sonidos.inicio; 
-        mpAmbiente.play();
-    }
-
-    function cerrarJuego() {
-        location.reload();
+        mpAmbiente.src = sonidos.inicio; mpAmbiente.play().catch(() => {});
     }
 
     function actualizarInterfaz() {
-        document.getElementById('txtStats').innerText = `ACCIONES: ${bajas} | MONEDAS: $${monedas} ${monedasPendientes != 0 ? '('+monedasPendientes+')' : ''}`;
+        document.getElementById('txtStats').innerText = `ACCIONES: ${bajas} | BOLSILLO: $${bolsillo} ${monedasGanadas > 0 ? '(+$'+monedasGanadas+')' : ''}`;
     }
+
+    function cerrarJuego() { location.reload(); }
 </script>
 </body>
 </html>
