@@ -28,7 +28,7 @@
 <div id="pantallaInicio" onclick="iniciarJuego()">
     <div class="container">
         <h2 style="color:#03DAC6">PROYECTO: DIEGO GOBERNADOR</h2>
-        <p>Toca cualquier lugar para iniciar la unidad</p>
+        <p>Toca para iniciar sistema</p>
         <button class="btn-lugar">ENTRAR AL SISTEMA</button>
     </div>
 </div>
@@ -46,7 +46,6 @@
         <button class="btn-lugar" onclick="viajarA('DORMITORIO', sonidos.dormitorio)">🛌 DORMITORIO</button>
         <button class="btn-lugar" onclick="viajarA('GIMNASIO', sonidos.gimnasio)">🏋️ GIMNASIO</button>
         <button class="btn-lugar" style="background-color: #4CAF50;" onclick="viajarA('GRANJITA', sonidos.granjita)">🐥 GRANJITA</button>
-        
         <button class="btn-tienda" onclick="abrirTienda()">🛒 TIENDA</button>
         <button class="btn-cerrar" onclick="cerrarJuego()">🚪 CERRAR JUEGO</button>
     </div>
@@ -56,61 +55,64 @@
     </div>
 
     <div id="layoutDisparos" class="hidden">
-        <button id="btnAccionPrincipal" class="btn-disparar" onclick="disparar('NORMAL')">💥 DISPARAR AL CUERPO</button>
-        <button id="btnAccionSecundaria" class="btn-ventana" onclick="disparar('VENTANA')">🪟 DISPARAR A VENTANA</button>
+        <button id="btnAccionPrincipal" class="btn-disparar" onclick="disparar()">💥 ACCIÓN</button>
+        <button id="btnAccionSecundaria" class="btn-ventana" onclick="disparar('VENTANA')">🪟 VENTANA</button>
     </div>
 
     <button id="btnVolver" class="btn-volver hidden" onclick="volver()">⬅️ REGRESAR</button>
 </div>
 
-<div id="pantallaSalida" class="hidden">
-    <div class="container">
-        <h2 style="color:#ff5252">OPERACIÓN TERMINADA</h2>
-        <button class="btn-lugar" onclick="location.reload()">REINICIAR JUEGO</button>
-    </div>
-</div>
-
 <script>
     const sonidos = {
-        inicio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview123/v4/a2/1b/28/a21b28f0-fad0-4a41-7e50-91a2189babae/mzaf_4293814841609392196.plus.aac.p.m4a",
+        inicio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/7a/6f/1f/7a6f1f7c-5d64-42d2-bdee-70808506f9a0/mzaf_7911195571041329504.plus.aac.p.m4a",
+        tienda_fondo: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/55/59/f3/5559f30a-1083-f7d3-c5be-f81cb952c6ba/mzaf_16958520360356130030.plus.aac.p.m4a",
+        error_dinero: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/e3/91/55/e3915559-ce44-59ee-e4b5-a9975d7be6b7/mzaf_5738924103697557085.plus.aac.p.m4a",
         puerta: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/9a/bd/86/mzm.xthhuevq.aac.p.m4a",
-        ventana: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/13/29/37/mzi.figfpbys.aac.p.m4a",
         muerte_enemigo: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/88/e1/0c/88e10c9e-d61b-c70b-bb37-76d01a5bc1b8/mzaf_4514180236780566538.plus.aac.p.m4a",
         aparicion_enemigo: "https://audio-ssl.itunes.apple.com/itunes-assets/Music49/v4/46/7a/d2/467ad2e8-b935-698d-3fac-fe52db582e9f/mzaf_4231950099606023021.plus.aac.p.m4a",
         caja_registradora: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/10/57/d3/mzi.aqzkfccl.aac.p.m4a",
-        ganar_monedas: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview128/v4/ae/c6/fb/aec6fb4a-b611-3f37-2d63-7d08ed0c6a2c/mzaf_432145209495902696.plus.aac.p.m4a",
+        
         sotano: "https://audio-ssl.itunes.apple.com/itunes-assets/Music2/v4/bc/07/32/bc0732ea-10ad-5155-954a-f2e8792cc64e/mzaf_263254705366250781.plus.aac.p.m4a",
         garaje: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview30/v4/de/04/83/de048374-d685-e8ba-b78c-1edcbf2c30aa/mzaf_1739495646603168620.plus.aac.p.m4a",
         patio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview115/v4/56/fe/d1/56fed19d-c176-335a-45eb-3838b2cfbcbc/mzaf_6679725853651299047.plus.aac.p.m4a",
         dormitorio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ec/4d/92/ec4d9293-512a-2279-a740-95b1c930eb67/mzaf_15926217069365452322.plus.aac.p.m4a",
         gimnasio: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview18/v4/a1/fc/44/a1fc4457-9ebd-07ef-c709-77eec046c0ab/mzaf_7879227667139224588.plus.aac.p.m4a",
-        granjita: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview125/v4/f8/9d/7e/f89d7e6b-d619-7865-0760-5dd9f98ac1ba/mzaf_7248418257611694717.plus.aac.p.m4a",
-        comer_vaca: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview128/v4/e7/e0/81/e7e08192-a089-c75b-2095-9f421250f810/mzaf_8409104725167469398.plus.aac.p.m4a",
-        agua_gallina: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/f6/4e/c5/f64ec556-b7bf-2caf-79fa-76b4ee3e7c86/mzaf_5942655225916879068.plus.aac.p.m4a"
+        granjita: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview60/v4/74/12/d7/7412d72d-4473-bd10-69e2-e238da355a73/mzaf_4490121898677393044.plus.aac.p.m4a",
+        
+        comer_animal: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview128/v4/e7/e0/81/e7e08192-a089-c75b-2095-9f421250f810/mzaf_8409104725167469398.plus.aac.p.m4a",
+        agua_animal: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/f6/4e/c5/f64ec556-b7bf-2caf-79fa-76b4ee3e7c86/mzaf_5942655225916879068.plus.aac.p.m4a",
+        sonido_gatito: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/40/35/1d/mzm.tjesbjop.aac.p.m4a",
+        sonido_perrito: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/d6/c9/ee/d6c9eed8-3396-f894-91d6-653cb7a2cfb2/mzaf_5754169641166804433.plus.aac.p.m4a"
     };
 
     const inventario = [
-        {nombre: "PISTOLA", sonido: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/bf/22/7b/bf227b10-691d-bc90-433c-d252eda15921/mzaf_7872033406982408122.plus.aac.p.m4a", precio: 0, comprada: true},
-        {nombre: "ESCOPETA", sonido: "https://audio-ssl.itunes.apple.com/itunes-assets/Music7/v4/df/2d/d6/df2dd6fc-6a74-b8e1-00c9-7d7d97f79f0b/mzaf_2373349655772360792.plus.aac.p.m4a", precio: 150, comprada: false},
-        {nombre: "FUSIL", sonido: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview118/v4/56/08/11/56081197-30f7-a068-bdb4-24f1abaa5e62/mzaf_8416388803162474287.plus.aac.p.m4a", precio: 350, comprada: false},
-        {nombre: "METRALLETA", sonido: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/a9/3c/8a/a93c8a73-bd26-6a72-c6cc-1bdbe06373ea/mzaf_1466118082777342552.plus.aac.p.m4a", precio: 500, comprada: false}
+        {nombre: "PISTOLA", precio: 0},
+        {nombre: "ESCOPETA", precio: 150},
+        {nombre: "FUSIL", precio: 350},
+        {nombre: "METRALLETA", precio: 500},
+        {nombre: "SACO SEMILLAS", precio: 50},
+        {nombre: "BOTE DE AGUA", precio: 30},
+        {nombre: "COSTAL WHISKAS", precio: 120},
+        {nombre: "COSTAL CROQUETAS", precio: 150},
+        {nombre: "VITAMINAS", precio: 100}
     ];
 
     const puntos = {
-        "SÓTANO": ["tras las cajas", "bajo la escalera", "en el tragaluz", "en la caldera", "tras el pilar", "en el conducto", "en el baúl", "en los estantes"],
-        "GARAJE": ["en la ventanilla del coche", "tras los neumáticos", "en la ventana lateral", "bajo el capó", "en el banco", "tras la moto", "en las repisas"],
-        "PATIO": ["tras los arbustos", "sobre la barda", "en el ventanal", "bajo el árbol", "tras la fuente", "en la caseta", "en la alberca", "tras la barbacoa"],
-        "DORMITORIO": ["en la cama", "tras el ropero", "en la ventana del balcón", "bajo la mesa", "tras las cortinas", "en el vestidor", "tras el espejo"],
-        "GIMNASIO": ["tras las pesas", "en las bancas", "tras los vidrios", "en la caminadora", "detrás del saco", "tras el dispensador"],
-        "GRANJITA": ["al gallo", "a la gallina", "a los coconos", "a la vaca", "al pollito", "al pato"]
+        "SÓTANO": ["tras las cajas", "bajo la escalera", "en el tragaluz"],
+        "GARAJE": ["en la ventanilla", "tras los neumáticos"],
+        "PATIO": ["tras los arbustos", "sobre la barda"],
+        "DORMITORIO": ["en la cama", "tras el ropero"],
+        "GIMNASIO": ["tras las pesas", "en las bancas"],
+        "GRANJITA": ["al gallo", "a la gallina", "a la vaca", "al pollito", "al pato", "al gatito", "al perrito"]
     };
 
-    let monedas = 0, monedasPendientes = 0, bajas = 0, armaEquipadaIdx = 0, lugarActual = "", enemigoActual = "";
+    let monedas = 0, monedasPendientes = 0, bajas = 0, lugarActual = "", enemigoActual = "";
     let mpAmbiente = new Audio(); mpAmbiente.loop = true;
 
     function sonarEfecto(url) {
+        if(!url) return;
         const s = new Audio(url);
-        s.play().catch(() => console.log("Error de audio"));
+        s.play().catch(() => {});
     }
 
     function iniciarJuego() {
@@ -126,8 +128,12 @@
         document.getElementById('txtEstado').innerText = "VIAJANDO...";
         sonarEfecto(sonidos.puerta);
         
+        // Detener sonido anterior antes de cambiar
+        mpAmbiente.pause();
+
         setTimeout(() => {
-            mpAmbiente.src = urlAmbiente; mpAmbiente.play();
+            mpAmbiente.src = urlAmbiente; 
+            mpAmbiente.play();
             document.getElementById('txtEstado').innerText = "📍 " + lugar;
             document.getElementById('layoutDisparos').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
@@ -146,108 +152,122 @@
         if(lugarActual === 'GRANJITA') {
             btnSecundario.classList.add('hidden');
             btnPrincipal.style.backgroundColor = "#2E7D32";
-            
             if (enemigoActual === 'a la gallina') {
-                alerta.innerText = "💧 LLÉNALES EL BOTE DE AGUA: " + enemigoActual.toUpperCase();
+                alerta.innerText = "💧 DALE AGUA: " + enemigoActual.toUpperCase();
                 btnPrincipal.innerText = "💧 DAR AGUA";
             } else {
-                alerta.innerText = "🍖 DALE DE COMER: " + enemigoActual.toUpperCase();
+                alerta.innerText = "🌾 DALE COMIDA: " + enemigoActual.toUpperCase();
                 btnPrincipal.innerText = "🌾 DAR COMIDA";
             }
-            alerta.style.color = "#8BC34A";
         } else {
             btnSecundario.classList.remove('hidden');
-            btnPrincipal.innerText = "💥 DISPARAR AL CUERPO";
+            btnPrincipal.innerText = "💥 DISPARAR CUERPO";
             btnPrincipal.style.backgroundColor = "#B00020";
             alerta.innerText = "⚠️ ENEMIGO: " + enemigoActual.toUpperCase();
-            alerta.style.color = "#ff1111";
         }
         alerta.style.visibility = "visible";
     }
 
-    function disparar(tipo) {
-        if(lugarActual !== 'GRANJITA') sonarEfecto(inventario[armaEquipadaIdx].sonido);
-        
-        const esVentana = enemigoActual.match(/ventana|ventanal|tragaluz|vidrio|cristal|ventanilla/i);
+    function disparar() {
+        if(lugarActual === 'GRANJITA') {
+            if((monedas + monedasPendientes) < 25) { 
+                sonarEfecto(sonidos.error_dinero);
+                alert("¡Necesitas dinero para suministros!");
+                return;
+            }
+            monedasPendientes -= 10; 
+        } else {
+            sonarEfecto("https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/bf/22/7b/bf227b10-691d-bc90-433c-d252eda15921/mzaf_7872033406982408122.plus.aac.p.m4a");
+        }
         
         setTimeout(() => {
             if (lugarActual === 'GRANJITA') {
-                if (enemigoActual === 'a la vaca') {
-                    sonarEfecto(sonidos.comer_vaca);
-                } else if (enemigoActual === 'a la gallina') {
-                    sonarEfecto(sonidos.agua_gallina);
-                }
+                if (enemigoActual === 'a la gallina') sonarEfecto(sonidos.agua_animal);
+                else if (enemigoActual === 'al gatito') sonarEfecto(sonidos.sonido_gatito);
+                else if (enemigoActual === 'al perrito') sonarEfecto(sonidos.sonido_perrito);
+                else sonarEfecto(sonidos.comer_animal);
                 exito(25);
-            } else if (tipo === 'VENTANA' && esVentana) {
-                sonarEfecto(sonidos.ventana); exito(35);
-            } else if (tipo === 'NORMAL' && !esVentana) {
-                exito(20);
             } else {
-                alert(esVentana ? "¡Está tras un vidrio! Usa VENTANA." : "¡No hay cristales ahí!");
+                exito(20);
             }
         }, 200);
     }
 
     function exito(premio) {
         if(lugarActual !== 'GRANJITA') sonarEfecto(sonidos.muerte_enemigo);
-        else if (enemigoActual !== 'a la vaca' && enemigoActual !== 'a la gallina') sonarEfecto(sonidos.ganar_monedas);
-
-        bajas++; monedasPendientes += premio;
+        bajas++; 
+        monedasPendientes += premio;
         actualizarInterfaz();
         document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
-        setTimeout(nuevoEnemigo, 1000);
+        setTimeout(() => {
+            if(lugarActual !== "") nuevoEnemigo();
+        }, 1000);
     }
 
     function abrirTienda() {
+        monedas += monedasPendientes;
+        monedasPendientes = 0;
+        mpAmbiente.pause();
         document.getElementById('layoutMenu').classList.add('hidden');
         document.getElementById('layoutTienda').classList.remove('hidden');
         document.getElementById('btnVolver').classList.remove('hidden');
+        mpAmbiente.src = sonidos.tienda_fondo; 
+        mpAmbiente.play();
         renderizarTienda();
     }
 
     function renderizarTienda() {
         const contenedor = document.getElementById('listaTienda');
         contenedor.innerHTML = "";
-        inventario.forEach((item, index) => {
+        inventario.forEach((item) => {
             const btn = document.createElement('button');
             btn.className = "btn-lugar";
-            btn.innerText = item.comprada ? (armaEquipadaIdx === index ? "EQUIPADA" : item.nombre) : `${item.nombre} ($${item.precio})`;
-            if(item.comprada && armaEquipadaIdx === index) btn.style.color = "#03DAC6";
+            btn.innerText = `${item.nombre} ($${item.precio})`;
             btn.onclick = () => {
-                if (item.comprada) { armaEquipadaIdx = index; }
-                else if (monedas >= item.precio) {
-                    monedas -= item.precio; item.comprada = true; armaEquipadaIdx = index;
+                if (monedas >= item.precio) {
+                    monedas -= item.precio; 
                     sonarEfecto(sonidos.caja_registradora);
+                    actualizarInterfaz();
+                } else {
+                    sonarEfecto(sonidos.error_dinero);
                 }
-                renderizarTienda(); actualizarInterfaz();
             };
             contenedor.appendChild(btn);
         });
     }
 
     function volver() {
-        if (monedasPendientes > 0) { monedas += monedasPendientes; sonarEfecto(sonidos.ganar_monedas); }
-        monedasPendientes = 0; mpAmbiente.pause();
+        // Detener sonido de la habitación
+        mpAmbiente.pause();
+        
+        monedas += monedasPendientes;
+        monedasPendientes = 0; 
+        lugarActual = ""; // Limpiar lugar para detener aparición de enemigos
+        
+        // Limpiar textos de alerta
+        const alerta = document.getElementById('txtAlertaEnemigo');
+        alerta.innerText = "";
+        alerta.style.visibility = "hidden";
+
         document.getElementById('layoutDisparos').classList.add('hidden');
         document.getElementById('layoutTienda').classList.add('hidden');
         document.getElementById('layoutMenu').classList.remove('hidden');
         document.getElementById('btnVolver').classList.add('hidden');
-        document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
         document.getElementById('txtEstado').innerText = "CENTRO DE MANDO";
+        
         actualizarInterfaz();
-        mpAmbiente.src = sonidos.inicio; mpAmbiente.play();
+        
+        // Volver a la música del menú
+        mpAmbiente.src = sonidos.inicio; 
+        mpAmbiente.play();
     }
 
     function cerrarJuego() {
-        mpAmbiente.pause();
-        mpAmbiente.src = "";
-        document.getElementById('gameContainer').classList.add('hidden');
-        document.getElementById('pantallaSalida').classList.remove('hidden');
+        location.reload();
     }
 
     function actualizarInterfaz() {
-        document.getElementById('txtStats').innerText = `ACCIONES: ${bajas} | MONEDAS: $${monedas} ${monedasPendientes > 0 ? '(+'+monedasPendientes+')' : ''}`;
-        document.getElementById('txtArmaActual').innerText = "EQUIPADA: " + inventario[armaEquipadaIdx].nombre;
+        document.getElementById('txtStats').innerText = `ACCIONES: ${bajas} | MONEDAS: $${monedas} ${monedasPendientes != 0 ? '('+monedasPendientes+')' : ''}`;
     }
 </script>
 </body>
