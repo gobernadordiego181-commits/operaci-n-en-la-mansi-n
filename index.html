@@ -90,6 +90,7 @@
     <div id="layoutDisparos" class="hidden">
         <button id="btnAccionPrincipal" class="btn-disparar" onclick="disparar()">💥 ACCIÓN</button>
         <button id="btnAccionSecundaria" class="btn-ventana" onclick="disparar('VENTANA')">🪟 VENTANA</button>
+        <button id="btnRiego" class="btn-lugar hidden" style="background-color: #03A9F4; margin-top: 10px;" onclick="activarRiego()">🚿 RIEGO</button>
     </div>
 
     <button id="btnVolver" class="btn-volver hidden" onclick="volver()">⬅️ REGRESAR</button>
@@ -114,17 +115,23 @@
         tecla_atm: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/c4/71/63/mzm.adfzpixy.aac.p.m4a",
         retiro_exito: "https://audio-ssl.itunes.apple.com/itunes-assets/Music3/v4/36/db/b9/36dbb957-0731-8ba3-dfee-0d40eb0f61be/mzaf_2892340779846391516.plus.aac.p.m4a",
         consulta_saldo: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/ea/8f/a1/ea8fa152-35c1-b5f6-489e-e6a1d60f0255/mzaf_5337907866947136257.plus.aac.p.m4a",
-        insertar_tarjeta: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/b3/87/89/mzm.aetuycmn.aac.p.m4a"
+        insertar_tarjeta: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/b3/87/89/mzm.aetuycmn.aac.p.m4a",
+        sonido_riego: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/9d/72/35/mzm.dqqqhgkt.aac.p.m4a",
+        sonido_sniper: "https://audio-ssl.itunes.apple.com/itunes-assets/Music1/v4/6a/65/8f/6a658f38-5933-bc66-f28a-97e99aa8b1e3/mzaf_7088366100322012219.plus.aac.p.m4a",
+        sonido_escopeta: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/ef/11/3d/mzm.abulctyc.aac.p.m4a",
+        sonido_ak47: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/d9/98/52/d99852d4-bb8c-2596-12bf-dcd2887d5bf2/mzaf_8517424947915641948.plus.aac.p.m4a",
+        sonido_mp5: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/6f/6a/e6/mzm.ermspwzo.aac.p.m4a",
+        sonido_magnum: "https://audio-ssl.itunes.apple.com/itunes-assets/Music7/v4/86/1c/69/861c697a-e4c4-3c66-e180-f7039a21f7f5/mzaf_9156160697905581794.plus.aac.p.m4a"
     };
 
     const inventarioTienda = [
         { nombre: "🛡️ CHALECO ANTIBALAS", precio: 1500 },
-        { nombre: "🚜 TRACTOR PEQUEÑO (GRANJA)", precio: 3000 },
-        { nombre: "🛌 CAMA KING SIZE (CUARTO)", precio: 1200 },
-        { nombre: "🏋️ BANCO DE PESAS PRO (GYM)", precio: 800 },
-        { nombre: "📦 ESTANTERÍA METAL (SÓTANO)", precio: 500 },
-        { nombre: "💡 LUCES LED (GARAJE)", precio: 300 },
-        { nombre: "🥩 COMIDA PREMIUM (ANIMALES)", precio: 100 }
+        { nombre: "🚿 RIEGO AUTOMÁTICO", precio: 3000 },
+        { nombre: "🔫 MAGNUM .44", precio: 2500, sonido: sonidos.sonido_magnum },
+        { nombre: "🔫 SUBFUSIL MP5", precio: 4000, sonido: sonidos.sonido_mp5 },
+        { nombre: "🔫 FUSIL AK-47", precio: 6000, sonido: sonidos.sonido_ak47 },
+        { nombre: "🔫 ESCOPETA TÁCTICA", precio: 3500, sonido: sonidos.sonido_escopeta },
+        { nombre: "🔫 RIFLE SNIPER", precio: 8000, sonido: sonidos.sonido_sniper }
     ];
 
     const puntos = {
@@ -137,6 +144,8 @@
 
     let bolsillo = 0, monedasGanadas = 0, bajas = 0, lugarActual = "", enemigoActual = "";
     let saldoTarjeta = 5000, entradaATM = "";
+    let tieneRiego = false; 
+    let sonidoArmaEquipada = sonidos.pistola; // Por defecto la pistola
     let mpAmbiente = new Audio(); mpAmbiente.loop = true;
 
     function sonarEfecto(url) { if(!url) return; const s = new Audio(url); s.play().catch(() => {}); }
@@ -159,6 +168,13 @@
             document.getElementById('txtEstado').innerText = "📍 " + lugar;
             document.getElementById('layoutDisparos').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
+            
+            if(lugarActual === 'GRANJITA' && tieneRiego) {
+                document.getElementById('btnRiego').classList.remove('hidden');
+            } else {
+                document.getElementById('btnRiego').classList.add('hidden');
+            }
+            
             nuevoEnemigo();
         }, 400); 
     }
@@ -189,9 +205,14 @@
             sonarEfecto(sonidos.muerte_enemigo); 
             exito(25);
         } else {
-            sonarEfecto(tipo === 'VENTANA' ? sonidos.ventana : sonidos.pistola);
+            // USAR EL SONIDO DEL ARMA EQUIPADA O VENTANA
+            sonarEfecto(tipo === 'VENTANA' ? sonidos.ventana : sonidoArmaEquipada);
             setTimeout(() => { sonarEfecto(sonidos.muerte_enemigo); exito(20); }, 200);
         }
+    }
+
+    function activarRiego() {
+        sonarEfecto(sonidos.sonido_riego);
     }
 
     function exito(premio) {
@@ -248,20 +269,34 @@
         inventarioTienda.forEach(item => {
             const div = document.createElement('div');
             div.className = 'item-tienda';
-            div.innerHTML = `<span class="item-nombre">${item.nombre}</span> <button style="width:100px; padding:8px; margin:0; background:#CF6679" onclick="comprarItem(${item.precio})">$${item.precio}</button>`;
+            div.innerHTML = `<span class="item-nombre">${item.nombre}</span> <button style="width:100px; padding:8px; margin:0; background:#CF6679" onclick="comprarItem('${item.nombre}', ${item.precio}, '${item.sonido || ''}')">$${item.precio}</button>`;
             lista.appendChild(div);
         });
         actualizarInterfaz();
     }
 
-    function comprarItem(precio) {
+    function comprarItem(nombre, precio, urlSonido) {
         if(bolsillo >= precio) {
             bolsillo -= precio;
             sonarEfecto(sonidos.caja_registradora);
+            
+            if(nombre === "🚿 RIEGO AUTOMÁTICO") {
+                tieneRiego = true;
+                sonarEfecto(sonidos.sonido_riego);
+            }
+            
+            if(nombre.includes("🔫")) {
+                document.getElementById('txtArmaActual').innerText = "EQUIPADA: " + nombre.replace("🔫 ", "");
+                if(urlSonido) {
+                    sonidoArmaEquipada = urlSonido; // ACTUALIZAMOS EL SONIDO DE DISPARO
+                    sonarEfecto(urlSonido); // Sonido de confirmación de compra
+                }
+            }
+            
             actualizarInterfaz();
         } else {
             sonarEfecto(sonidos.error_dinero);
-            alert("No tienes suficiente dinero en el BOLSILLO. Retira del cajero.");
+            alert("No tienes suficiente dinero en el BOLSILLO.");
         }
     }
 
@@ -281,6 +316,7 @@
         document.getElementById('layoutCajero').classList.add('hidden');
         document.getElementById('layoutMenu').classList.remove('hidden');
         document.getElementById('btnVolver').classList.add('hidden');
+        document.getElementById('btnRiego').classList.add('hidden');
         document.getElementById('txtEstado').innerText = "CENTRO DE MANDO";
         actualizarInterfaz();
         mpAmbiente.src = sonidos.inicio; mpAmbiente.play().catch(() => {});
