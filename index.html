@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Acción Pro - Diego Gobernador</title>
+    <title>Juego de AcciÃ³n Pro - Diego Gobernador</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #000; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; touch-action: manipulation; }
         .container { width: 100%; max-width: 450px; background: #121212; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px rgba(3, 218, 198, 0.2); }
@@ -40,14 +40,14 @@
     <div id="txtAlertaEnemigo" class="alerta"></div>
 
     <div id="layoutMenu">
-        <button class="btn-lugar" onclick="viajarA('SÓTANO', sonidos.sotano)">🧱 SÓTANO</button>
-        <button class="btn-lugar" onclick="viajarA('GARAJE', sonidos.garaje)">🚗 GARAJE</button>
-        <button class="btn-lugar" onclick="viajarA('PATIO', sonidos.patio)">🌳 PATIO</button>
-        <button class="btn-lugar" onclick="viajarA('DORMITORIO', sonidos.dormitorio)">🛌 DORMITORIO</button>
-        <button class="btn-lugar" onclick="viajarA('GIMNASIO', sonidos.gimnasio)">🏋️ GIMNASIO</button>
-        <button class="btn-lugar" style="background-color: #4CAF50;" onclick="viajarA('GRANJITA', sonidos.granjita)">🐥 GRANJITA</button>
-        <button class="btn-tienda" onclick="abrirTienda()">🛒 TIENDA</button>
-        <button class="btn-cerrar" onclick="cerrarJuego()">🚪 CERRAR JUEGO</button>
+        <button class="btn-lugar" onclick="viajarA('SÃTANO', sonidos.sotano)">ð§± SÃTANO</button>
+        <button class="btn-lugar" onclick="viajarA('GARAJE', sonidos.garaje)">ð GARAJE</button>
+        <button class="btn-lugar" onclick="viajarA('PATIO', sonidos.patio)">ð³ PATIO</button>
+        <button class="btn-lugar" onclick="viajarA('DORMITORIO', sonidos.dormitorio)">ð DORMITORIO</button>
+        <button class="btn-lugar" onclick="viajarA('GIMNASIO', sonidos.gimnasio)">ðï¸ GIMNASIO</button>
+        <button class="btn-lugar" style="background-color: #4CAF50;" onclick="viajarA('GRANJITA', sonidos.granjita)">ð¥ GRANJITA</button>
+        <button class="btn-tienda" onclick="abrirTienda()">ð TIENDA</button>
+        <button class="btn-cerrar" onclick="cerrarJuego()">ðª CERRAR JUEGO</button>
     </div>
 
     <div id="layoutTienda" class="hidden">
@@ -55,11 +55,11 @@
     </div>
 
     <div id="layoutDisparos" class="hidden">
-        <button id="btnAccionPrincipal" class="btn-disparar" onclick="disparar()">💥 ACCIÓN</button>
-        <button id="btnAccionSecundaria" class="btn-ventana" onclick="disparar('VENTANA')">🪟 VENTANA</button>
+        <button id="btnAccionPrincipal" class="btn-disparar" onclick="disparar()">ð¥ ACCIÃN</button>
+        <button id="btnAccionSecundaria" class="btn-ventana" onclick="disparar('VENTANA')">ðª VENTANA</button>
     </div>
 
-    <button id="btnVolver" class="btn-volver hidden" onclick="volver()">⬅️ REGRESAR</button>
+    <button id="btnVolver" class="btn-volver hidden" onclick="volver()">â¬ï¸ REGRESAR</button>
 </div>
 
 <script>
@@ -99,8 +99,8 @@
     ];
 
     const puntos = {
-        "SÓTANO": ["tras las cajas", "bajo la escalera", "en el tragaluz"],
-        "GARAJE": ["en la ventanilla", "tras los neumáticos"],
+        "SÃTANO": ["tras las cajas", "bajo la escalera", "en el tragaluz"],
+        "GARAJE": ["en la ventanilla", "tras los neumÃ¡ticos"],
         "PATIO": ["tras los arbustos", "sobre la barda"],
         "DORMITORIO": ["en la cama", "tras el ropero"],
         "GIMNASIO": ["tras las pesas", "en las bancas"],
@@ -132,7 +132,7 @@
         setTimeout(() => {
             mpAmbiente.src = urlAmbiente; 
             mpAmbiente.play();
-            document.getElementById('txtEstado').innerText = "📍 " + lugar;
+            document.getElementById('txtEstado').innerText = "ð " + lugar;
             document.getElementById('layoutDisparos').classList.remove('hidden');
             document.getElementById('btnVolver').classList.remove('hidden');
             nuevoEnemigo();
@@ -151,17 +151,17 @@
             btnSecundario.classList.add('hidden');
             btnPrincipal.style.backgroundColor = "#2E7D32";
             if (enemigoActual === 'a la gallina') {
-                alerta.innerText = "💧 DALE AGUA: " + enemigoActual.toUpperCase();
-                btnPrincipal.innerText = "💧 DAR AGUA";
+                alerta.innerText = "ð§ DALE AGUA: " + enemigoActual.toUpperCase();
+                btnPrincipal.innerText = "ð§ DAR AGUA";
             } else {
-                alerta.innerText = "🌾 DALE COMIDA: " + enemigoActual.toUpperCase();
-                btnPrincipal.innerText = "🌾 DAR COMIDA";
+                alerta.innerText = "ð¾ DALE COMIDA: " + enemigoActual.toUpperCase();
+                btnPrincipal.innerText = "ð¾ DAR COMIDA";
             }
         } else {
             btnSecundario.classList.remove('hidden');
-            btnPrincipal.innerText = "💥 DISPARAR CUERPO";
+            btnPrincipal.innerText = "ð¥ DISPARAR CUERPO";
             btnPrincipal.style.backgroundColor = "#B00020";
-            alerta.innerText = "⚠️ ENEMIGO: " + enemigoActual.toUpperCase();
+            alerta.innerText = "â ï¸ ENEMIGO: " + enemigoActual.toUpperCase();
         }
         alerta.style.visibility = "visible";
     }
@@ -170,12 +170,12 @@
         if(lugarActual === 'GRANJITA') {
             if((monedas + monedasPendientes) < 25) { 
                 sonarEfecto(sonidos.error_dinero);
-                alert("¡Necesitas dinero para suministros!");
+                alert("Â¡Necesitas dinero para suministros!");
                 return;
             }
             monedasPendientes -= 10; 
         } else {
-            // Sonido de disparo normal o ventana según el botón
+            // Sonido de disparo normal o ventana segÃºn el botÃ³n
             if(tipo === 'VENTANA') sonarEfecto(sonidos.ventana);
             else sonarEfecto("https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/bf/22/7b/bf227b10-691d-bc90-433c-d252eda15921/mzaf_7872033406982408122.plus.aac.p.m4a");
         }
