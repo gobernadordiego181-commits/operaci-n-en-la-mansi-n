@@ -120,4 +120,213 @@
         sonido_sniper: "https://audio-ssl.itunes.apple.com/itunes-assets/Music1/v4/6a/65/8f/6a658f38-5933-bc66-f28a-97e99aa8b1e3/mzaf_7088366100322012219.plus.aac.p.m4a",
         sonido_escopeta: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/ef/11/3d/mzm.abulctyc.aac.p.m4a",
         sonido_ak47: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/v4/d9/98/52/d99852d4-bb8c-2596-12bf-dcd2887d5bf2/mzaf_8517424947915641948.plus.aac.p.m4a",
-        sonido_mp5: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/6f/6a/
+        sonido_mp5: "https://audio-ssl.itunes.apple.com/itunes-assets/Music/6f/6a/e6/mzm.ermspwzo.aac.p.m4a",
+        sonido_magnum: "https://audio-ssl.itunes.apple.com/itunes-assets/Music7/v4/86/1c/69/861c697a-e4c4-3c66-e180-f7039a21f7f5/mzaf_9156160697905581794.plus.aac.p.m4a"
+    };
+
+    const inventarioTienda = [
+        { nombre: "🛡️ CHALECO ANTIBALAS", precio: 1500 },
+        { nombre: "🚿 RIEGO AUTOMÁTICO", precio: 3000 },
+        { nombre: "🔫 MAGNUM .44", precio: 2500, sonido: sonidos.sonido_magnum },
+        { nombre: "🔫 SUBFUSIL MP5", precio: 4000, sonido: sonidos.sonido_mp5 },
+        { nombre: "🔫 FUSIL AK-47", precio: 6000, sonido: sonidos.sonido_ak47 },
+        { nombre: "🔫 ESCOPETA TÁCTICA", precio: 3500, sonido: sonidos.sonido_escopeta },
+        { nombre: "🔫 RIFLE SNIPER", precio: 8000, sonido: sonidos.sonido_sniper }
+    ];
+
+    const puntos = {
+        "SÓTANO": ["tras las cajas", "bajo la escalera", "en el tragaluz"],
+        "GARAJE": ["en la ventanilla", "tras los neumáticos"],
+        "DORMITORIO": ["en la cama", "tras el ropero"],
+        "GIMNASIO": ["tras las pesas", "en las bancas"],
+        "GRANJITA": ["al gallo", "a la gallina", "a la vaca", "al pollito", "al pato", "al gatito", "al perrito"]
+    };
+
+    let bolsillo = 0, monedasGanadas = 0, bajas = 0, lugarActual = "", enemigoActual = "";
+    let saldoTarjeta = 5000, entradaATM = "";
+    let tieneRiego = false; 
+    let sonidoArmaEquipada = sonidos.pistola; // Por defecto la pistola
+    let mpAmbiente = new Audio(); mpAmbiente.loop = true;
+
+    function sonarEfecto(url) { if(!url) return; const s = new Audio(url); s.play().catch(() => {}); }
+
+    function iniciarJuego() {
+        document.getElementById('pantallaInicio').classList.add('hidden');
+        document.getElementById('gameContainer').classList.remove('hidden');
+        mpAmbiente.src = sonidos.inicio;
+        mpAmbiente.play().catch(() => {});
+    }
+
+    function viajarA(lugar, urlAmbiente) {
+        lugarActual = lugar;
+        document.getElementById('layoutMenu').classList.add('hidden');
+        document.getElementById('txtEstado').innerText = "VIAJANDO...";
+        sonarEfecto(sonidos.puerta);
+        mpAmbiente.pause();
+        setTimeout(() => {
+            mpAmbiente.src = urlAmbiente; mpAmbiente.play().catch(() => {});
+            document.getElementById('txtEstado').innerText = "📍 " + lugar;
+            document.getElementById('layoutDisparos').classList.remove('hidden');
+            document.getElementById('btnVolver').classList.remove('hidden');
+            
+            if(lugarActual === 'GRANJITA' && tieneRiego) {
+                document.getElementById('btnRiego').classList.remove('hidden');
+            } else {
+                document.getElementById('btnRiego').classList.add('hidden');
+            }
+            
+            nuevoEnemigo();
+        }, 400); 
+    }
+
+    function nuevoEnemigo() {
+        const lista = puntos[lugarActual];
+        enemigoActual = lista[Math.floor(Math.random() * lista.length)];
+        sonarEfecto(sonidos.aparicion_enemigo);
+        const alerta = document.getElementById('txtAlertaEnemigo');
+        const btnPrincipal = document.getElementById('btnAccionPrincipal');
+        const btnSecundario = document.getElementById('btnAccionSecundaria');
+        alerta.style.visibility = "visible";
+        if(lugarActual === 'GRANJITA') {
+            btnSecundario.classList.add('hidden');
+            btnPrincipal.style.backgroundColor = "#2E7D32";
+            alerta.innerText = "❤️ TRABAJO: " + enemigoActual.toUpperCase();
+            btnPrincipal.innerText = "DAR COMIDA";
+        } else {
+            btnSecundario.classList.remove('hidden');
+            btnPrincipal.style.backgroundColor = "#B00020";
+            alerta.innerText = "⚠️ ENEMIGO: " + enemigoActual.toUpperCase();
+            btnPrincipal.innerText = "DISPARAR";
+        }
+    }
+
+    function disparar(tipo) {
+        if(lugarActual === 'GRANJITA') {
+            sonarEfecto(sonidos.muerte_enemigo); 
+            exito(25);
+        } else {
+            // USAR EL SONIDO DEL ARMA EQUIPADA O VENTANA
+            sonarEfecto(tipo === 'VENTANA' ? sonidos.ventana : sonidoArmaEquipada);
+            setTimeout(() => { sonarEfecto(sonidos.muerte_enemigo); exito(20); }, 200);
+        }
+    }
+
+    function activarRiego() {
+        sonarEfecto(sonidos.sonido_riego);
+    }
+
+    function exito(premio) {
+        bajas++; monedasGanadas += premio; actualizarInterfaz();
+        document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
+        setTimeout(() => { if(lugarActual !== "") nuevoEnemigo(); }, 1000);
+    }
+
+    function abrirCajero() {
+        depositarATarjeta();
+        sonarEfecto(sonidos.puerta); mpAmbiente.pause();
+        document.getElementById('layoutMenu').classList.add('hidden');
+        document.getElementById('layoutCajero').classList.remove('hidden');
+        document.getElementById('btnVolver').classList.remove('hidden');
+        document.getElementById('txtEstado').innerText = "🏧 CAJERO";
+        entradaATM = ""; document.getElementById('btnTarjeta').classList.remove('hidden');
+        document.getElementById('controlesATM').classList.add('hidden');
+        document.getElementById('mensajeATM').innerText = "INSERTE TARJETA";
+        document.getElementById('montoATM').innerText = "";
+    }
+
+    function insertarTarjeta() {
+        sonarEfecto(sonidos.insertar_tarjeta);
+        document.getElementById('btnTarjeta').classList.add('hidden');
+        document.getElementById('controlesATM').classList.remove('hidden');
+        document.getElementById('mensajeATM').innerText = "HOLA";
+    }
+
+    function tecla(n) { sonarEfecto(sonidos.tecla_atm); if(entradaATM.length < 6) { entradaATM += n; document.getElementById('montoATM').innerText = "$" + entradaATM; } }
+    function borrar() { sonarEfecto(sonidos.tecla_atm); entradaATM = ""; document.getElementById('montoATM').innerText = ""; }
+    function verSaldo() { sonarEfecto(sonidos.consulta_saldo); document.getElementById('mensajeATM').innerText = "SALDO:"; document.getElementById('montoATM').innerText = "$" + saldoTarjeta; }
+    
+    function retirar() {
+        let cant = parseInt(entradaATM);
+        if(cant > 0 && cant <= saldoTarjeta) {
+            saldoTarjeta -= cant; 
+            bolsillo += cant;
+            sonarEfecto(sonidos.retiro_exito);
+            document.getElementById('mensajeATM').innerText = "¡EXITO!";
+            actualizarInterfaz();
+        } else { document.getElementById('mensajeATM').innerText = "ERROR"; }
+        entradaATM = ""; document.getElementById('montoATM').innerText = "";
+    }
+
+    function abrirTienda() {
+        depositarATarjeta();
+        document.getElementById('layoutMenu').classList.add('hidden');
+        document.getElementById('layoutTienda').classList.remove('hidden');
+        document.getElementById('btnVolver').classList.remove('hidden');
+        mpAmbiente.pause(); mpAmbiente.src = sonidos.tienda_fondo; mpAmbiente.play().catch(() => {});
+        
+        const lista = document.getElementById('listaTienda');
+        lista.innerHTML = "";
+        inventarioTienda.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'item-tienda';
+            div.innerHTML = `<span class="item-nombre">${item.nombre}</span> <button style="width:100px; padding:8px; margin:0; background:#CF6679" onclick="comprarItem('${item.nombre}', ${item.precio}, '${item.sonido || ''}')">$${item.precio}</button>`;
+            lista.appendChild(div);
+        });
+        actualizarInterfaz();
+    }
+
+    function comprarItem(nombre, precio, urlSonido) {
+        if(bolsillo >= precio) {
+            bolsillo -= precio;
+            sonarEfecto(sonidos.caja_registradora);
+            
+            if(nombre === "🚿 RIEGO AUTOMÁTICO") {
+                tieneRiego = true;
+                sonarEfecto(sonidos.sonido_riego);
+            }
+            
+            if(nombre.includes("🔫")) {
+                document.getElementById('txtArmaActual').innerText = "EQUIPADA: " + nombre.replace("🔫 ", "");
+                if(urlSonido) {
+                    sonidoArmaEquipada = urlSonido; // ACTUALIZAMOS EL SONIDO DE DISPARO
+                    sonarEfecto(urlSonido); // Sonido de confirmación de compra
+                }
+            }
+            
+            actualizarInterfaz();
+        } else {
+            sonarEfecto(sonidos.error_dinero);
+            alert("No tienes suficiente dinero en el BOLSILLO.");
+        }
+    }
+
+    function depositarATarjeta() {
+        saldoTarjeta += monedasGanadas;
+        monedasGanadas = 0;
+        actualizarInterfaz();
+    }
+
+    function volver() {
+        mpAmbiente.pause();
+        depositarATarjeta();
+        lugarActual = "";
+        document.getElementById('txtAlertaEnemigo').style.visibility = "hidden";
+        document.getElementById('layoutDisparos').classList.add('hidden');
+        document.getElementById('layoutTienda').classList.add('hidden');
+        document.getElementById('layoutCajero').classList.add('hidden');
+        document.getElementById('layoutMenu').classList.remove('hidden');
+        document.getElementById('btnVolver').classList.add('hidden');
+        document.getElementById('btnRiego').classList.add('hidden');
+        document.getElementById('txtEstado').innerText = "CENTRO DE MANDO";
+        actualizarInterfaz();
+        mpAmbiente.src = sonidos.inicio; mpAmbiente.play().catch(() => {});
+    }
+
+    function actualizarInterfaz() {
+        document.getElementById('txtStats').innerText = `ACCIONES: ${bajas} | BOLSILLO: $${bolsillo} ${monedasGanadas > 0 ? '(+$'+monedasGanadas+')' : ''}`;
+    }
+
+    function cerrarJuego() { location.reload(); }
+</script>
+</body>
+</html>
